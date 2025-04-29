@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   mini_shell.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
+/*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/15 18:21:36 by obarais           #+#    #+#             */
-/*   Updated: 2025/04/23 10:16:30 by ael-jama         ###   ########.fr       */
+/*   Created: 2025/04/25 11:56:27 by obarais           #+#    #+#             */
+/*   Updated: 2025/04/29 18:28:59 by obarais          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#ifndef	MINI_SHELL_H
+# define MINI_SHELL_H
 
 # include "libft/libft.h"
 # include <fcntl.h>
@@ -23,7 +23,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
-// #include "../exection_part/minishell_exec.h"
+# include <stdbool.h>
 
 typedef enum e_input_type
 {
@@ -33,7 +33,6 @@ typedef enum e_input_type
 	REDIRECT_OUT,
 	APPEND,
 	HEREDOC,
-	VARIABLE,
 }					t_input_type;
 
 typedef struct s_input
@@ -43,23 +42,31 @@ typedef struct s_input
 	struct s_input	*next;
 }					t_input;
 
+typedef struct s_list_env
+{
+	char			*key;
+	char			*value;
+	struct s_list_env	*next;
+}					list_env;
+
 typedef struct s_redir
 {
     char *filename;
-    int   type; // 0 = input, 1 = output, 2 = append, 3 = heredoc
+    int   type;
     struct s_redir *next;
-} t_redir;
+}					t_redir;
 
 typedef struct s_command
 {
-	char    *cmd;       // "cat"
-    char    **args;      // {"file.txt", NULL}
-    t_redir *inoutfile;     // لائحة ديال ملفات input (input أو heredoc)
+	char    *cmd;
+    char    **args;
+    t_redir *inoutfile;
     struct s_command *next;
-} t_command;
+}					t_command;
 
-void				execute_commind_line(t_command **list);
-int	ft_strcmp(const char *s1, const char *s2);
-void    exection(t_command *cmd_list, char ***env);
+void	tokenization(char *line, t_input **tok);
+void	expand_variables(t_input **tok, list_env *env);
+void 	parsing_tokns(t_input *tok);
+void    exection(struct s_command *cmd_list, char ***env);
 
 #endif

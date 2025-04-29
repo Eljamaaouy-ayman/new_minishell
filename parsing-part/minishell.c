@@ -3,85 +3,62 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
+/*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/15 18:21:12 by obarais           #+#    #+#             */
-/*   Updated: 2025/04/23 10:17:58 by ael-jama         ###   ########.fr       */
+/*   Created: 2025/04/25 11:56:34 by obarais           #+#    #+#             */
+/*   Updated: 2025/04/29 18:52:23 by obarais          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "mini_shell.h"
 
-void printbanner(void)
+void	ft_list_env(char **env, list_env **env_list)
 {
-    printf("███╗   ███╗██╗   ██╗    ███████╗██╗  ██╗███████╗██╗     ██╗\n"
-"████╗ ████║╚██╗ ██╔╝    ██╔════╝██║  ██║██╔════╝██║     ██║\n"  
-"██╔████╔██║ ╚████╔╝     ███████╗███████║█████╗  ██║     ██║\n"
-"██║╚██╔╝██║  ╚██╔╝      ╚════██║██╔══██║██╔══╝  ██║     ██║\n"
-"██║ ╚═╝ ██║   ██║       ███████║██║  ██║███████╗███████╗███████╗\n"
-"╚═╝     ╚═╝   ╚═╝       ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝\n");
-}
+	int i;
+	int j;
+	list_env *new_env;
+	list_env *tmp;
 
-void    typ_of_input(t_input **new)
-{
-    if (ft_strncmp((*new)->value, "|", ft_strlen((*new)->value)) == 0)
-        (*new)->type = PIPE;
-    else if (ft_strncmp((*new)->value, "<", ft_strlen((*new)->value)) == 0)
-        (*new)->type = REDIRECT_IN;
-    else if (ft_strncmp((*new)->value, ">", ft_strlen((*new)->value)) == 0)
-        (*new)->type = REDIRECT_OUT;
-    else if (ft_strncmp((*new)->value, ">>", ft_strlen((*new)->value)) == 0)
-        (*new)->type = APPEND;
-    else if (ft_strncmp((*new)->value, "<<", ft_strlen((*new)->value)) == 0)
-        (*new)->type = HEREDOC;
-    else if ((*new)->value[0] == '$')
-        (*new)->type = VARIABLE;
-    else
-        (*new)->type = WORD;
-}
-
-void    list_input(char **input, t_input **list)
-{
-    int i = 0;
-    int j = 0;
-    t_input *new;
-    t_input *tmp;
-
-    while (input[i] != NULL)
-        i++;
-    while (j < i)
+	i = 0;
+	j = 0;
+	while (env[i])
     {
-        new = (t_input *)malloc(sizeof(t_input));
-        new->value = ft_strdup(input[j]);
-        typ_of_input(&new);
-        new->next = NULL;
-        if (*list == NULL)
-            *list = new;
+        j = 0;
+        while (env[i][j] != '=')
+            j++;
+        new_env = (list_env *)malloc(sizeof(list_env));
+        if (!new_env)
+            return ;
+        new_env->key = ft_substr(env[i], 0, j);
+        new_env->value = ft_substr(env[i], j + 1, ft_strlen(env[i]) - j);
+        new_env->next = NULL;
+        if (*env_list == NULL)
+            *env_list = new_env;
         else
         {
-            tmp = *list;
+            tmp = *env_list;
             while (tmp->next != NULL)
                 tmp = tmp->next;
-            tmp->next = new;
+            tmp->next = new_env;
         }
-        j++;
+        i++;
     }
 }
 
-char **put_the_args(t_input *list, char *cmd)
+char **put_the_args(t_input *tok, char *cmd)
 {
     char **args;
     int i = 0;
     int j = 0;
-    t_input *tmp;
     t_input *tmp2;
-    
-    tmp = list;
+    t_input *tmp;
+
+    tmp = tok;
     while (strcmp(tmp->value, cmd) != 0)
         tmp = tmp->next;
     tmp = tmp->next;
     tmp2 = tmp;
-    while(tmp2 != NULL && tmp2->type != PIPE)
+    while(tmp2 && tmp2->type != PIPE)
     {
         i++;
         tmp2 = tmp2->next;
@@ -89,7 +66,7 @@ char **put_the_args(t_input *list, char *cmd)
     args = (char **)malloc(sizeof(char *) * (i + 1));
     if (args == NULL)
         return (NULL);
-    while (tmp != NULL && tmp->type != PIPE)
+    while (tmp  && tmp->type != PIPE)
     {
         args[j] = ft_strdup(tmp->value);
         j++;
@@ -102,21 +79,21 @@ char **put_the_args(t_input *list, char *cmd)
 int what_direction(char *str)
 {
     if (strcmp(str, "<") == 0)
-        return 0; // input
+        return 0;
     else if (strcmp(str, ">") == 0)
-        return 1; // output
+        return 1;
     else if (strcmp(str, ">>") == 0)
-        return 2; // append
+        return 2;
     else if (strcmp(str, "<<") == 0)
-        return 3; // heredoc
-    return -1; // unknown
+        return 3;
+    return -1;
 }
 
 t_redir *check_derctions(char **args)
 {
     int i = 0;
     t_redir *redir = NULL;
-    
+
     while (args[i] != NULL)
     {
         if (strcmp(args[i], "<") == 0 || strcmp(args[i], ">") == 0 || strcmp(args[i], ">>") == 0 || strcmp(args[i], "<<") == 0)
@@ -137,73 +114,119 @@ t_redir *check_derctions(char **args)
                 tmp->next = new_redir;
                 new_redir->next = NULL;
             }
-            // i++;
         }
         i++;
     }
     return redir;
 }
 
+void	list_commands(t_input *tok, t_command **cmd_list)
+{
+	t_command *new_cmd;
+	t_command *tmp;
 
-void    list_command(t_input **list, t_command **cmd_list)
-{    
-    while(*list != NULL)
+	while(tok != NULL)
     {
-        t_command *new_cmd = (t_command *)malloc(sizeof(t_command));
-        new_cmd->cmd = ft_strdup((*list)->value);
-        new_cmd->args = put_the_args(*list, (*list)->value);
+        new_cmd = (t_command *)malloc(sizeof(t_command));
+        new_cmd->cmd = ft_strdup((tok)->value);
+        new_cmd->args = put_the_args(tok, tok->value);
         new_cmd->inoutfile = check_derctions(new_cmd->args);
         new_cmd->next = NULL;
         if (*cmd_list == NULL)
             *cmd_list = new_cmd;
         else
         {
-            t_command *tmp = *cmd_list;
+            tmp = *cmd_list;
             while (tmp->next != NULL)
                 tmp = tmp->next;
             tmp->next = new_cmd;
         }
-        t_input *tmp = *list;
-        while (*list != NULL && (*list)->type != PIPE)
-        {
-            tmp = *list;
-            *list = (*list)->next;
-            free(tmp->value);
-            free(tmp);
-        }
-        if (*list && (*list)->type == PIPE)
-        {
-            tmp = *list;
-            *list = (*list)->next;
-            free(tmp->value);
-            free(tmp);
-        }
+		while (tok && tok->type != PIPE)
+			tok = tok->next;
+		if (tok)
+			tok = tok->next;
     }
 }
 
-int main(int ac, char **av, char **env)
+void printbanner(void)
 {
-    char *line;
-    t_command *cmd_list = NULL;
-    (void)ac;
-    (void)av;
+    printf("███╗   ███╗██╗   ██╗    ███████╗██╗  ██╗███████╗██╗     ██╗\n"
+"████╗ ████║╚██╗ ██╔╝    ██╔════╝██║  ██║██╔════╝██║     ██║\n"
+"██╔████╔██║ ╚████╔╝     ███████╗███████║█████╗  ██║     ██║\n"
+"██║╚██╔╝██║  ╚██╔╝      ╚════██║██╔══██║██╔══╝  ██║     ██║\n"
+"██║ ╚═╝ ██║   ██║       ███████║██║  ██║███████╗███████╗███████╗\n"
+"╚═╝     ╚═╝   ╚═╝       ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝\n");
+}
 
+int	main(int ac, char **av, char **env)
+{
+	(void)av;
+	char	*line;
+	t_input	*tok;
+	list_env	*env_list;
+	t_command	*cmd_list;
+
+	env_list = NULL;
+	cmd_list = NULL;
+	tok = NULL;
+	if (ac != 1)
+		return (printf("Error: Too many arguments\n"), 1);
     printbanner();
-    while((line = readline("minishell$ ")) != NULL && ft_strcmp(line, "exit") != 0)
-    {
-        if (strlen(line) > 0)
-        {
-            add_history(line);  // Add input to history
+	while(1)
+	{
+		line = readline("minishell$ ");
 
-            // Split line into arguments (space-separated)
-            char **input = ft_split(line);
-            t_input *list = NULL;
-            list_input(input, &list);
-            list_command(&list, &cmd_list);
+		if (!line)
+			return(printf("Exiting...\n"), 1);
+		if (strlen(line) > 0)
+		{
+			add_history(line);
+
+			tokenization(line, &tok);
+            parsing_tokns(tok);
+			ft_list_env(env, &env_list);
+
+            // t_input *tmp = tok;
+            // while (tmp)
+            // {
+            //     printf("tmp: %s\n", tmp->value);
+            //     printf("type: %d\n", tmp->type);
+            //     tmp = tmp->next;
+            // }
+
+
+			expand_variables(&tok, env_list);
+			list_commands(tok, &cmd_list);
+
+            int j = 1;
+            t_command *cmd_list2 = cmd_list;
+            while (cmd_list2)
+            {
+                    printf("command %d:\n", j);
+                    printf("cmd :%s\n", cmd_list2->cmd);
+                    printf("args :");
+                    for (size_t i = 0; cmd_list2->args[i]; i++)
+                    {
+                            printf("%s  ", cmd_list2->args[i]);
+                        }
+                        printf("\n");
+                        while(cmd_list2->inoutfile)
+                       {
+                        printf("filename :%s   type:%d\n",  cmd_list2->inoutfile->filename, cmd_list2->inoutfile->type);
+                        cmd_list2->inoutfile = cmd_list2->inoutfile->next;
+                    }
+                    cmd_list2 = cmd_list2->next;
+                    j++;
+            }
             exection(cmd_list, &env);
-        }
-        cmd_list = NULL;
-        free(line);  // Free the allocated memory for the line
-    }
-    return 0;
+
+            cmd_list = NULL;
+            tok = NULL;
+			pid_t pid = fork();
+            if (pid == 0)
+                exit(1);
+            else
+				wait(&pid);
+		}
+	}
 }

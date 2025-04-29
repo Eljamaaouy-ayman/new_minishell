@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_exec.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
+/*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 00:23:34 by eljamaaouya       #+#    #+#             */
-/*   Updated: 2025/04/23 10:18:42 by ael-jama         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:28:40 by obarais          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <sys/wait.h>
-#include "../parsing-part/minishell.h"
+#include "../parsing-part/mini_shell.h"
 #include "../parsing-part/libft/libft.h"
 
 

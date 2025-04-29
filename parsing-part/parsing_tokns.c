@@ -1,27 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   parsing_tokns.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/22 12:04:27 by obarais           #+#    #+#             */
-/*   Updated: 2025/04/25 15:23:43 by obarais          ###   ########.fr       */
+/*   Created: 2025/04/28 09:34:00 by obarais           #+#    #+#             */
+/*   Updated: 2025/04/28 16:49:32 by obarais          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "mini_shell.h"
 
-size_t	ft_strlen(const char *s)
+void 	parsing_tokns(t_input *tok)
 {
-	size_t	i;
+	t_input *tmp;
+	int i = 0;
 
-	i = 0;
-	if (!s)
-		return (0);
-	while (s[i] != '\0')
+	tmp = tok;
+	while (tmp)
 	{
-		i++;
+		if(tmp->type == HEREDOC)
+			i++;
+		else if (tmp->type == PIPE)
+			i = 0;
+		tmp = tmp->next;
 	}
-	return (i);
+	if (i > 16)
+	{
+		printf("Error: Too many heredocs\n");
+		exit(1);
+	}
 }
