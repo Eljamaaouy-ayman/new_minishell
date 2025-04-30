@@ -60,6 +60,12 @@ char **put_the_args(t_input *tok, char *cmd)
     tmp2 = tmp;
     while(tmp2 && tmp2->type != PIPE)
     {
+        if (tmp2->type == HEREDOC || tmp2->type == APPEND || tmp2->type == REDIRECT_IN || tmp2->type == REDIRECT_OUT)
+        {
+            tmp2 = tmp2->next;
+            tmp2 = tmp2->next;
+            continue;
+        }
         i++;
         tmp2 = tmp2->next;
     }
@@ -68,6 +74,12 @@ char **put_the_args(t_input *tok, char *cmd)
         return (NULL);
     while (tmp  && tmp->type != PIPE)
     {
+        if (tmp->type == HEREDOC || tmp->type == APPEND || tmp->type == REDIRECT_IN || tmp->type == REDIRECT_OUT)
+        {
+            tmp = tmp->next;
+            tmp = tmp->next;
+            continue;
+        }
         args[j] = ft_strdup(tmp->value);
         j++;
         tmp = tmp->next;
@@ -89,33 +101,36 @@ int what_direction(char *str)
     return -1;
 }
 
-t_redir *check_derctions(char **args)
+t_redir *check_derctions(t_input *tok, char *cmd)
 {
-    int i = 0;
     t_redir *redir = NULL;
+    t_input *tmp;
+    t_redir *new_redir;
+    t_redir *tmp2;
 
-    while (args[i] != NULL)
+    tmp = tok;
+    while (strcmp(tmp->value, cmd) != 0)
+        tmp = tmp->next;
+    tmp = tmp->next;
+    while (tmp && tmp->type != PIPE)
     {
-        if (strcmp(args[i], "<") == 0 || strcmp(args[i], ">") == 0 || strcmp(args[i], ">>") == 0 || strcmp(args[i], "<<") == 0)
+        if (tmp->type == HEREDOC || tmp->type == APPEND || tmp->type == REDIRECT_IN || tmp->type == REDIRECT_OUT)
         {
-            t_redir *new_redir = (t_redir *)malloc(sizeof(t_redir));
-            new_redir->filename = ft_strdup(args[i + 1]);
-            new_redir->type = what_direction(args[i]);
+            new_redir = (t_redir *)malloc(sizeof(t_redir));
+            new_redir->filename = ft_strdup(tmp->next->value);
+            new_redir->type = what_direction(tmp->value);
+            new_redir->next = NULL;
             if (redir == NULL)
-            {
                 redir = new_redir;
-                redir->next = NULL;
-            }
             else
             {
-                t_redir *tmp = redir;
-                while (tmp->next != NULL)
-                    tmp = tmp->next;
-                tmp->next = new_redir;
-                new_redir->next = NULL;
+                tmp2 = redir;
+                while (tmp2->next != NULL)
+                    tmp2 = tmp2->next;
+                tmp2->next = new_redir;
             }
         }
-        i++;
+        tmp = tmp->next;
     }
     return redir;
 }
@@ -130,7 +145,7 @@ void	list_commands(t_input *tok, t_command **cmd_list)
         new_cmd = (t_command *)malloc(sizeof(t_command));
         new_cmd->cmd = ft_strdup((tok)->value);
         new_cmd->args = put_the_args(tok, tok->value);
-        new_cmd->inoutfile = check_derctions(new_cmd->args);
+        new_cmd->inoutfile = check_derctions(tok , tok->value);
         new_cmd->next = NULL;
         if (*cmd_list == NULL)
             *cmd_list = new_cmd;
@@ -207,11 +222,11 @@ int	main(int ac, char **av, char **env)
                     printf("args :");
                     for (size_t i = 0; cmd_list2->args[i]; i++)
                     {
-                            printf("%s  ", cmd_list2->args[i]);
-                        }
-                        printf("\n");
-                        while(cmd_list2->inoutfile)
-                       {
+                        printf("%s  ", cmd_list2->args[i]);
+                    }
+                    printf("\n");
+                    while(cmd_list2->inoutfile)
+                    {
                         printf("filename :%s   type:%d\n",  cmd_list2->inoutfile->filename, cmd_list2->inoutfile->type);
                         cmd_list2->inoutfile = cmd_list2->inoutfile->next;
                     }

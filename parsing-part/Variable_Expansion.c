@@ -6,7 +6,7 @@
 /*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 08:06:45 by obarais           #+#    #+#             */
-/*   Updated: 2025/04/30 07:00:40 by obarais          ###   ########.fr       */
+/*   Updated: 2025/04/30 08:49:21 by obarais          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ char *ft_check_quote(char *str, list_env *env, char q)
 			i++;
 			while (str[i] && str[i] != '"')
 			{
-				if (str[i] == '$' && str[i + 1] != '$')
+				if (str[i] == '$' && str[i + 1] != '?' && str[i + 1] != '$')
 				{
 					i++;
 					if (str[i] >= 48 && str[i] <= 57 && i++)
