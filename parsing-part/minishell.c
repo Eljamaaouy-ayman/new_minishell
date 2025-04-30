@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:56:34 by obarais           #+#    #+#             */
-/*   Updated: 2025/04/29 18:52:23 by obarais          ###   ########.fr       */
+/*   Updated: 2025/04/30 17:13:13 by ael-jama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	ft_list_env(char **env, list_env **env_list)
             return ;
         new_env->key = ft_substr(env[i], 0, j);
         new_env->value = ft_substr(env[i], j + 1, ft_strlen(env[i]) - j);
+        new_env->equal = 1;
         new_env->next = NULL;
         if (*env_list == NULL)
             *env_list = new_env;
@@ -218,7 +219,7 @@ int	main(int ac, char **av, char **env)
                     cmd_list2 = cmd_list2->next;
                     j++;
             }
-            exection(cmd_list, &env);
+            // exection(cmd_list, &env_list);
 
             cmd_list = NULL;
             tok = NULL;

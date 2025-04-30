@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   mini_shell.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:56:27 by obarais           #+#    #+#             */
-/*   Updated: 2025/04/29 18:28:59 by obarais          ###   ########.fr       */
+/*   Updated: 2025/04/30 15:40:02 by ael-jama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef	MINI_SHELL_H
 # define MINI_SHELL_H
 
+# include "../exection_part/minishell_exec.h"
 # include "libft/libft.h"
 # include <fcntl.h>
 # include <readline/history.h>
@@ -46,6 +47,7 @@ typedef struct s_list_env
 {
 	char			*key;
 	char			*value;
+	int				equal;
 	struct s_list_env	*next;
 }					list_env;
 
@@ -67,6 +69,6 @@ typedef struct s_command
 void	tokenization(char *line, t_input **tok);
 void	expand_variables(t_input **tok, list_env *env);
 void 	parsing_tokns(t_input *tok);
-void    exection(struct s_command *cmd_list, char ***env);
+void    exection(struct s_command *cmd_list, list_env **env_list);
 
 #endif

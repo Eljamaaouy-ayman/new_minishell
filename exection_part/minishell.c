@@ -6,7 +6,7 @@
 /*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 00:24:19 by eljamaaouya       #+#    #+#             */
-/*   Updated: 2025/04/23 13:04:15 by ael-jama         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:13:02 by ael-jama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,21 +98,22 @@ void	ft_cd(char **cmdlist)
 	}
 }
 
-void	exection(t_command *cmd_list, char ***env)
+void	exection(t_command *cmd_list, list_env **env_list)
 {
+	char **env = list_to_table(*env_list);
 	// printf("%s", cmd_list->cmd);
 	if (ft_strcmp(cmd_list->cmd, "pwd") == 0)
 		getworkingdir();
 	else if (ft_strcmp(cmd_list->cmd, "env") == 0)
-		getenvfunc(*env);
+		getenvfunc(env);
 	else if (ft_strcmp(cmd_list->cmd, "echo") == 0)
 		ft_echo(cmd_list->args);
 	else if (ft_strcmp(cmd_list->cmd, "cd") == 0)
 		ft_cd(cmd_list->args);
 	else if (ft_strcmp(cmd_list->cmd, "export") == 0)
-		ft_export(cmd_list->args, env);
+		ft_export(cmd_list->args, &env);
 	else if (ft_strcmp(cmd_list->cmd, "unset") == 0)
-		ft_unset(cmd_list->args, env);
+		ft_unset(cmd_list->args, &env);
 	else
 	{
 		shell_luncher(cmd_list);

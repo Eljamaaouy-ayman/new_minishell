@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_exec.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: obarais <obarais@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ael-jama <ael-jama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 00:23:34 by eljamaaouya       #+#    #+#             */
-/*   Updated: 2025/04/29 18:28:40 by obarais          ###   ########.fr       */
+/*   Updated: 2025/04/30 16:03:13 by ael-jama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #ifndef MINISHELL_EXEC_H
 # define MINISHELL_EXEC_H
 
+#include "../Pipex/pipex_bonus/pipex_bonus.h"
 #include <stdbool.h>
 # include <stdio.h>
 # include <limits.h>
@@ -43,7 +44,9 @@ void    ft_export(char **args, char ***env);
 char	*ft_strjoin(char const *s1, char const *s2);
 int     execve_like_execvp(const char *file, char *const argv[]);
 struct s_command;
-void    exection(struct s_command *cmd_list, char ***env);
+struct s_list_env;
+void    exection(struct s_command *cmd_list, struct s_list_env **env_list);
+char **list_to_table(struct s_list_env *list);
 
 
 #endif
