@@ -68,7 +68,7 @@ char *ft_check_quote(char *str, list_env *env, char q)
 			i++;
 			while (str[i] && str[i] != '"')
 			{
-				if (str[i] == '$' && str[i + 1] != '?' && str[i + 1] != '$')
+				if (str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_'))
 				{
 					i++;
 					if (str[i] >= 48 && str[i] <= 57 && i++)
@@ -120,7 +120,7 @@ void expand_variables(t_input **tok, list_env *env)
 		{
 			while (temp->value[i])
 			{
-				if (temp->value[i] == '$' && temp->value[i + 1] && temp->value[i + 1] != '?' && temp->value[i + 1] != '$')
+				if (temp->value[i] == '$' && temp->value[i + 1] && (ft_isalnum(temp->value[i + 1]) || temp->value[i + 1] == '_'))
 				{
 					i++;
 					if (temp->value[i] >= 48 && temp->value[i] <= 57 && i++)
